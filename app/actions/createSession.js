@@ -6,11 +6,13 @@ async function createSession(previousState, formData) {
 
   if (!email || !password) {
     return {
-      error: 'Please fill out all fields',
+      error: "Please fill out all fields",
     };
   }
 
-  console.log(email, password);
+  return {
+    success: true,
+  };
 }
 
 export default createSession;
