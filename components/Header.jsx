@@ -1,31 +1,24 @@
 "use client";
-import checkAuth from "@/app/actions/checkAuth";
 import destroySession from "@/app/actions/destroySession";
 import logo from "@/assets/images/logo.svg";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { FaBuilding, FaSignInAlt, FaSignOutAlt, FaUser } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { useAuth } from "@/context/authContext";
 
 const Header = () => {
   const router = useRouter();
 
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
-
-  useEffect(() => {
-    const fetchAuthStatus = async () => {
-      const result = await checkAuth();
-      setIsAuthenticated(result.isAuthenticated);
-    };
-    fetchAuthStatus();
-  }, []);
+  // Import the custom useAuth hook from context
+  const { isAuthenticated, setIsAuthenticated } = useAuth();
 
   const handleLogout = async () => {
     const { success, error } = await destroySession();
 
     if (success) {
+      setIsAuthenticated(false);
       router.push("/login");
     } else {
       toast.error(error);
@@ -38,7 +31,12 @@ const Header = () => {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
             <Link href="/">
-              <Image className="h-12 w-12" src={logo} alt="Bookit" priority={true} />
+              <Image
+                className="h-12 w-12"
+                src={logo}
+                alt="Bookit"
+                priority={true}
+              />
             </Link>
 
             <div className="hidden md:block">
@@ -76,10 +74,16 @@ const Header = () => {
               {/* Logged Out Only */}
               {!isAuthenticated && (
                 <>
-                  <Link href="/login" className="mr-3 text-gray-800 hover:text-gray-600">
+                  <Link
+                    href="/login"
+                    className="mr-3 text-gray-800 hover:text-gray-600"
+                  >
                     <FaSignInAlt className="inline mr-1" /> Login
                   </Link>
-                  <Link href="/register" className="mr-3 text-gray-800 hover:text-gray-600">
+                  <Link
+                    href="/register"
+                    className="mr-3 text-gray-800 hover:text-gray-600"
+                  >
                     <FaUser className="inline mr-1" /> Register
                   </Link>
                 </>
@@ -90,7 +94,10 @@ const Header = () => {
                   <Link href="/rooms/my">
                     <FaBuilding className="inline mr-1" /> My Rooms
                   </Link>
-                  <button onClick={handleLogout} className="mx-3 text-gray-800 hover:text-gray-600">
+                  <button
+                    onClick={handleLogout}
+                    className="mx-3 text-gray-800 hover:text-gray-600"
+                  >
                     <FaSignOutAlt className="inline mr-1" /> Sign Out
                   </button>
                 </>
