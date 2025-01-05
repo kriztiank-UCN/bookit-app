@@ -37,8 +37,8 @@ const LoginPage = () => {
     setLoading(false);
     return;
   }
-  if (!validator.isLength(formData.password, { min: 5 })) {
-    setError("Password must be at least 5 characters");
+  if (!validator.isLength(formData.password, { min: 8 })) {
+    setError("Password must be at least 8 characters");
     setLoading(false);
     return;
   }
@@ -119,13 +119,14 @@ const LoginPage = () => {
             {error && <p className='text-red-500 text-sm'>{error}</p>}
 
             <button
-              type='submit'
+              type='button'
+              onClick={handleSubmit}
               className={`bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 ${
                 loading ? "opacity-50 cursor-not-allowed" : ""
               }`}
               disabled={loading}
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? "logging in..." : "login"}
             </button>
 
             {/* Register link */}
