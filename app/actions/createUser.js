@@ -14,9 +14,9 @@ async function createUser(previousState, formData) {
     };
   }
 
-  if (password.length < 8) {
+  if (password.length < 5) {
     return {
-      error: 'Password must be at least 8 characters long',
+      error: 'Password must be at least 5 characters long',
     };
   }
 

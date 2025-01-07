@@ -21,7 +21,7 @@ const getFormElements = () => {
   const elements = {
     emailInput: screen.getByRole("textbox", { name: /email/i }),
     passwordInput: screen.getByLabelText("Password"),
-    submitButton: screen.getByRole("button", { name: /login/i }),
+    submitButton: screen.getByRole("button", { name: /submit/i }),
   };
   return elements;
 };

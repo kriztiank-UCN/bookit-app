@@ -37,8 +37,8 @@ const LoginPage = () => {
     setLoading(false);
     return;
   }
-  if (!validator.isLength(formData.password, { min: 8 })) {
-    setError("Password must be at least 8 characters");
+  if (!validator.isLength(formData.password, { min: 5 })) {
+    setError("Password must be at least 5 characters");
     setLoading(false);
     return;
   }
@@ -126,7 +126,7 @@ const LoginPage = () => {
               }`}
               disabled={loading}
             >
-              {loading ? "logging in..." : "login"}
+              {loading ? "logging in..." : "Submit"}
             </button>
 
             {/* Register link */}

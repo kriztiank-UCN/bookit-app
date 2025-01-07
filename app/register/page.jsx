@@ -16,7 +16,7 @@ const RegisterPage = () => {
       toast.success("You can now log in!");
       router.push("/login");
     }
-  }, [state]);
+  }, [state, router]);
 
   return (
     <div className='flex items-center justify-center'>

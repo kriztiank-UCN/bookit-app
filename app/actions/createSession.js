@@ -6,7 +6,7 @@ async function createSession(formData) {
   try {
     // Safely extract form data
     const email = formData.get('email')?.trim() || '';
-    const password = formData.get('password') || '';
+    const password = formData.get('password')?.trim() || '';
 
     console.log('Received formData:', {
       email: formData.get('email'),
