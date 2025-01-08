@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import CancelBookingButton from './CancelBookingButton';
 
 const BookedRoomCard = ({ booking }) => {
   const { room_id: room } = booking;
@@ -45,6 +46,7 @@ const BookedRoomCard = ({ booking }) => {
         >
           View Room
         </Link>
+        <CancelBookingButton bookingId={booking.$id} />
       </div>
     </div>
   );
