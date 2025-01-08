@@ -6,8 +6,9 @@ import { ID } from 'node-appwrite';
 import { redirect } from 'next/navigation';
 import checkAuth from './checkAuth';
 import { revalidatePath } from 'next/cache';
+import checkRoomAvailability from './checkRoomAvailability';
 
-async function bookRoom(_, formData) {
+async function bookRoom(previousState, formData) {
   const sessionCookie = cookies().get('appwrite-session');
   if (!sessionCookie) {
     redirect('/login');
@@ -36,6 +37,19 @@ async function bookRoom(_, formData) {
     const checkInDateTime = `${checkInDate}T${checkInTime}`;
     const checkOutDateTime = `${checkOutDate}T${checkOutTime}`;
 
+    // Check if room is available
+    const isAvailable = await checkRoomAvailability(
+      roomId,
+      checkInDateTime,
+      checkOutDateTime
+    );
+
+    if (!isAvailable) {
+      return {
+        error: 'This room is already booked for the selected time',
+      };
+    }
+
     const bookingData = {
       check_in: checkInDateTime,
       check_out: checkOutDateTime,
@@ -44,7 +58,7 @@ async function bookRoom(_, formData) {
     };
 
     // Create booking
-      await databases.createDocument(
+    const newBooking = await databases.createDocument(
       process.env.NEXT_PUBLIC_APPWRITE_DATABASE,
       process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_BOOKINGS,
       ID.unique(),
