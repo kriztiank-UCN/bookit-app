@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
-import bookRoom from '@/app/actions/bookRoom';
+import { bookRoom } from '@/app/actions/bookRoom';
 
 const BookingForm = ({ room} ) => {
   const [state, formAction] = useFormState(bookRoom, {});
