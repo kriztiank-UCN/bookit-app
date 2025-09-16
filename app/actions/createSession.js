@@ -2,7 +2,7 @@
 import { createAdminClient } from '@/config/appwrite';
 import { cookies } from 'next/headers';
 
-async function createSession(formData) {
+async function createSession(_previousState, formData) {
   try {
     // Safely extract form data
     const email = formData.get('email')?.trim() || '';
