@@ -4,7 +4,7 @@ import checkAuth from "./checkAuth";
 import { ID } from "node-appwrite";
 import { revalidatePath } from "next/cache";
 
-async function createRoom(previousState, formData) {
+async function createRoom(_previousState, formData) {
   // Get databases instance
   const { databases, storage } = await createAdminClient();
 
