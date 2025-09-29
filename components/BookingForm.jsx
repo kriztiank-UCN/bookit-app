@@ -1,22 +1,25 @@
-'use client';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { useFormState } from 'react-dom';
-import { toast } from 'react-toastify';
-import { bookRoom } from '@/app/actions/bookRoom';
+"use client";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useFormState } from "react-dom";
+import { toast } from "react-toastify";
+import { bookRoom } from "@/app/actions/bookRoom";
+import { useAuth } from "@/context/authContext";
 
-const BookingForm = ({ room} ) => {
-  const [state, formAction] = useFormState(bookRoom, {});
-
+const BookingForm = ({ room }) => {
   const router = useRouter();
+  const [state, formAction] = useFormState(bookRoom, {});
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (state.error) toast.error(state.error);
     if (state.success) {
-      toast.success('Room has been booked!');
-      router.push('/bookings');
+      toast.success("Room has been booked!");
+      router.push("/bookings");
     }
   }, [state, router]);
+
+  if (!isAuthenticated) return null; // Hide form if not authenticated
 
   return (
     <div className='mt-6'>
@@ -25,10 +28,7 @@ const BookingForm = ({ room} ) => {
         <input type='hidden' name='room_id' value={room.$id} />
         <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
           <div>
-            <label
-              htmlFor='check_in_date'
-              className='block text-sm font-medium text-gray-700'
-            >
+            <label htmlFor='check_in_date' className='block text-sm font-medium text-gray-700'>
               Check-In Date
             </label>
             <input
@@ -40,10 +40,7 @@ const BookingForm = ({ room} ) => {
             />
           </div>
           <div>
-            <label
-              htmlFor='check_in_time'
-              className='block text-sm font-medium text-gray-700'
-            >
+            <label htmlFor='check_in_time' className='block text-sm font-medium text-gray-700'>
               Check-In Time
             </label>
             <input
@@ -55,10 +52,7 @@ const BookingForm = ({ room} ) => {
             />
           </div>
           <div>
-            <label
-              htmlFor='check_out_date'
-              className='block text-sm font-medium text-gray-700'
-            >
+            <label htmlFor='check_out_date' className='block text-sm font-medium text-gray-700'>
               Check-Out Date
             </label>
             <input
@@ -70,10 +64,7 @@ const BookingForm = ({ room} ) => {
             />
           </div>
           <div>
-            <label
-              htmlFor='check_out_time'
-              className='block text-sm font-medium text-gray-700'
-            >
+            <label htmlFor='check_out_time' className='block text-sm font-medium text-gray-700'>
               Check-Out Time
             </label>
             <input
