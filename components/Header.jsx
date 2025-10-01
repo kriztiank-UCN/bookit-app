@@ -12,7 +12,7 @@ const Header = () => {
   const router = useRouter();
 
   // Import the custom useAuth hook from context
-  const { isAuthenticated, setIsAuthenticated } = useAuth();
+  const { isAuthenticated, setIsAuthenticated, currentUser, isAdmin } = useAuth();
 
   const handleLogout = async () => {
     const { success, error } = await destroySession();
@@ -26,7 +26,7 @@ const Header = () => {
   };
 
   return (
-    <header className='sticky top-0 bg-gray-100'>
+    <header className='bg-gray-100'>
       <nav className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         <div className='flex h-16 items-center justify-between'>
           <div className='flex items-center'>
@@ -52,12 +52,14 @@ const Header = () => {
                     >
                       Bookings
                     </Link>
-                    <Link
-                      href='/rooms/add'
-                      className='rounded-md px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-700 hover:text-white'
-                    >
-                      Add Room
-                    </Link>
+                    {isAdmin && currentUser?.role !== undefined && (
+                      <Link
+                        href='/rooms/add'
+                        className='rounded-md px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-700 hover:text-white'
+                      >
+                        Add Room
+                      </Link>
+                    )}
                   </>
                 )}
               </div>
@@ -80,9 +82,12 @@ const Header = () => {
               {/* Logged In Only */}
               {isAuthenticated && (
                 <>
-                  <Link href='/rooms/my'>
-                    <FaBuilding className='inline mr-1' /> My Rooms
-                  </Link>
+                  {/* Admin Only */}
+                  {isAdmin && currentUser?.role !== undefined && (
+                    <Link href='/rooms/my'>
+                      <FaBuilding className='inline mr-1' /> My Rooms
+                    </Link>
+                  )}
                   <button onClick={handleLogout} className='mx-3 text-gray-800 hover:text-gray-600'>
                     <FaSignOutAlt className='inline mr-1' /> Sign Out
                   </button>
@@ -112,12 +117,15 @@ const Header = () => {
               >
                 Bookings
               </Link>
-              <Link
-                href='/rooms/add'
-                className='block rounded-md px-3 py-2 text-base font-medium text-gray-800 hover:bg-gray-700 hover:text-white'
-              >
-                Add Room
-              </Link>
+              {/* Admin Only */}
+              {isAdmin && currentUser?.role !== undefined && (
+                <Link
+                  href='/rooms/add'
+                  className='block rounded-md px-3 py-2 text-base font-medium text-gray-800 hover:bg-gray-700 hover:text-white'
+                >
+                  Add Room
+                </Link>
+              )}
             </>
           )}
         </div>

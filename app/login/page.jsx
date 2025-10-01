@@ -2,47 +2,45 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import createSession from "../actions/createSession";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useFormState } from "react-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "@/context/authContext";
+// Import actions to verify auth and admin status
+import checkAuth from "@/app/actions/checkAuth";
+// Import action to check admin status
+import checkAdmin from "@/app/actions/checkAdmin";
 
 const LoginPage = () => {
   const [state, formAction] = useFormState(createSession, {});
-  const { setIsAuthenticated } = useAuth();
+  const { setIsAuthenticated, setCurrentUser, setIsAdmin } = useAuth();
   const router = useRouter();
 
-  // Detect test environment
-  const isTest = typeof process !== "undefined" && process.env.NODE_ENV === "test";
-
-  // Local state for error in test mode
-  const [testError, setTestError] = useState("");
-  const formRef = useRef(null);
-
   useEffect(() => {
-    if (!isTest && state.error) toast.error(state.error);
-    if (!isTest && state.success) {
+    if (state.error) toast.error(state.error);
+    if (state.success) {
       toast.success("Logged in successfully!");
-      setIsAuthenticated(true);
-      router.push("/");
+      // Verify authentication and admin status after login
+      (async () => {
+        const { isAuthenticated, user } = await checkAuth();
+        setIsAuthenticated(isAuthenticated);
+        setCurrentUser(user);
+        if (isAuthenticated) {
+          const { isAdmin } = await checkAdmin();
+          setIsAdmin(isAdmin);
+        } else {
+          setIsAdmin(false);
+        }
+        router.push("/");
+      })();
     }
-  }, [state, setIsAuthenticated, router, isTest]);
-
-  // Custom submit handler for tests
-  const handleTestSubmit = async e => {
-    e.preventDefault();
-    const formData = new FormData(formRef.current);
-    const result = await createSession({}, formData);
-    setTestError(result.error || "");
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   return (
     <div className='flex items-center justify-center'>
       <div className='bg-white shadow-lg rounded-lg p-6 w-full max-w-sm mt-20'>
-        <form
-          ref={formRef}
-          {...(isTest ? { onSubmit: handleTestSubmit, action: undefined } : { action: formAction })}
-        >
+        <form action={formAction}>
           <h2 className='text-2xl font-bold text-center text-gray-800 mb-6'>Login</h2>
 
           <div className='mb-4'>
@@ -55,7 +53,7 @@ const LoginPage = () => {
               name='email'
               className='border rounded w-full py-2 px-3'
               autoComplete='email'
-              aria-label='Email'
+              // required
             />
           </div>
 
@@ -69,18 +67,11 @@ const LoginPage = () => {
               name='password'
               className='border rounded w-full py-2 px-3'
               autoComplete='password'
-              aria-label='Password'
+              // required
             />
           </div>
 
           <div className='flex flex-col gap-5'>
-            {/* Show error for both test and prod */}
-            {(isTest ? testError : state.error) && (
-              <p className='text-red-500 text-sm' data-testid='error-message'>
-                {isTest ? testError : state.error}
-              </p>
-            )}
-
             <button
               type='submit'
               className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700'

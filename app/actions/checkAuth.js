@@ -1,9 +1,9 @@
-'use server';
-import { createSessionClient } from '@/config/appwrite';
-import { cookies } from 'next/headers';
+"use server";
+import { createSessionClient } from "@/config/appwrite";
+import { cookies } from "next/headers";
 
 async function checkAuth() {
-  const sessionCookie = cookies().get('appwrite-session');
+  const sessionCookie = cookies().get("appwrite-session");
 
   if (!sessionCookie) {
     return {
@@ -21,6 +21,7 @@ async function checkAuth() {
         id: user.$id,
         name: user.name,
         email: user.email,
+        role: user.prefs.role,
       },
     };
   } catch (error) {

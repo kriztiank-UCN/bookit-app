@@ -4,11 +4,13 @@ import { useEffect } from "react";
 import { useFormState } from "react-dom";
 import { toast } from "react-toastify";
 import { bookRoom } from "@/app/actions/bookRoom";
+// Import the useAuth hook to access authentication status
 import { useAuth } from "@/context/authContext";
 
 const BookingForm = ({ room }) => {
   const router = useRouter();
   const [state, formAction] = useFormState(bookRoom, {});
+  // Get authentication status from context
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
