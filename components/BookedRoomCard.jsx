@@ -46,6 +46,12 @@ const BookedRoomCard = ({ booking }) => {
         >
           View Room
         </Link>
+                <Link
+          href={`/bookings/edit/${booking.$id}`}
+          className='bg-yellow-500 text-white px-4 py-2 rounded w-full sm:w-auto text-center hover:bg-yellow-700'
+        >
+          Edit Booking
+        </Link>
         <CancelBookingButton bookingId={booking.$id} />
       </div>
     </div>
