@@ -9,7 +9,7 @@ import checkAuth from "./checkAuth";
 import { revalidatePath } from "next/cache";
 import checkRoomAvailability from "./checkRoomAvailability";
 
-export const bookRoom = async (_, formData) => {
+export const bookRoom = async (_previousState, formData) => {
   const sessionCookie = cookies().get("appwrite-session");
   if (!sessionCookie) {
     redirect("/login");
