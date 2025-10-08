@@ -12,8 +12,8 @@ const EditBookingForm = ({ booking }) => {
 
   return (
     <form
-      action={async formData => {
-        await formAction(formData);
+      action={formData => {
+        formAction(formData);
         if (state.error) toast.error(state.error);
         if (state.success) {
           toast.success("Booking updated!");
