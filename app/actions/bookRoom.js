@@ -38,6 +38,25 @@ export const bookRoom = async (_previousState, formData) => {
     const checkInDateTime = `${checkInDate}T${checkInTime}`;
     const checkOutDateTime = `${checkOutDate}T${checkOutTime}`;
 
+    // Validate check-in and check-out times
+    const now = new Date();
+    const checkIn = new Date(checkInDateTime);
+    const checkOut = new Date(checkOutDateTime);
+
+    // Check if check-in is in the past
+    if (checkIn <= now) {
+      return {
+        error: "Check-in time cannot be in the past",
+      };
+    }
+
+    // Check if check-out is before check-in
+    if (checkOut <= checkIn) {
+      return {
+        error: "Check-out time must be after check-in time",
+      };
+    }
+
     // Check if room is available
     const isAvailable = await checkRoomAvailability(roomId, checkInDateTime, checkOutDateTime);
 
