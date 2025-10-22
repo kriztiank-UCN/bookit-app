@@ -34,7 +34,7 @@ const RegisterPage = () => {
               name='name'
               className='border rounded w-full py-2 px-3'
               autoComplete='name'
-              required
+              // required
             />
           </div>
 
@@ -48,7 +48,7 @@ const RegisterPage = () => {
               name='email'
               className='border rounded w-full py-2 px-3'
               autoComplete='email'
-              required
+  
             />
           </div>
 
@@ -61,7 +61,6 @@ const RegisterPage = () => {
               id='password'
               name='password'
               className='border rounded w-full py-2 px-3'
-              required
               autoComplete='password'
             />
           </div>
@@ -76,7 +75,6 @@ const RegisterPage = () => {
               name='confirm-password'
               className='border rounded w-full py-2 px-3'
               autoComplete='confirm-password'
-              required
             />
           </div>
 
