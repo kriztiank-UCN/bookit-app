@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import checkAuth from "./checkAuth";
 import { revalidatePath } from "next/cache";
 import checkRoomAvailability from "./checkRoomAvailability";
+import { DateTime } from "luxon";
 
 export const bookRoom = async (_previousState, formData) => {
   const sessionCookie = cookies().get("appwrite-session");
@@ -33,32 +34,37 @@ export const bookRoom = async (_previousState, formData) => {
     const checkOutDate = formData.get("check_out_date");
     const checkOutTime = formData.get("check_out_time");
     const roomId = formData.get("room_id");
+    const userTimezone = formData.get("user_timezone") || "UTC";
 
-    // Combine date and time to ISO 8601 format
+    // Combine date and time to ISO 8601 format in user's timezone
     const checkInDateTime = `${checkInDate}T${checkInTime}`;
     const checkOutDateTime = `${checkOutDate}T${checkOutTime}`;
 
-    // Validate check-in and check-out times
-    const now = new Date();
-    const checkIn = new Date(checkInDateTime);
-    const checkOut = new Date(checkOutDateTime);
+    // Convert to UTC using Luxon with user's timezone
+    const checkInUTC = DateTime.fromISO(checkInDateTime, { zone: userTimezone }).toUTC().toISO();
+    const checkOutUTC = DateTime.fromISO(checkOutDateTime, { zone: userTimezone }).toUTC().toISO();
+
+    // Validate check-in and check-out times using UTC values
+    const now = DateTime.now().toUTC();
+    const checkInUTCDate = DateTime.fromISO(checkInUTC);
+    const checkOutUTCDate = DateTime.fromISO(checkOutUTC);
 
     // Check if check-in is in the past
-    if (checkIn <= now) {
+    if (checkInUTCDate <= now) {
       return {
         error: "Check-in time cannot be in the past",
       };
     }
 
     // Check if check-out is before check-in
-    if (checkOut <= checkIn) {
+    if (checkOutUTCDate <= checkInUTCDate) {
       return {
         error: "Check-out time must be after check-in time",
       };
     }
 
-    // Check if room is available
-    const isAvailable = await checkRoomAvailability(roomId, checkInDateTime, checkOutDateTime);
+    // Check if room is available using UTC times
+    const isAvailable = await checkRoomAvailability(roomId, checkInUTC, checkOutUTC);
 
     if (!isAvailable) {
       return {
@@ -67,10 +73,11 @@ export const bookRoom = async (_previousState, formData) => {
     }
 
     const bookingData = {
-      check_in: checkInDateTime,
-      check_out: checkOutDateTime,
+      check_in: checkInUTC,
+      check_out: checkOutUTC,
       user_id: user.id,
       room_id: roomId,
+      // Note: user_timezone removed until database schema is updated
     };
 
     // Create booking
@@ -82,7 +89,15 @@ export const bookRoom = async (_previousState, formData) => {
     );
 
     // USE SEND EMAIL NOTIFICATION
-    const emailMessage = `Greetings from Bookit. Your booking has been confirmed. Check-in: ${checkInDateTime}, Check-out: ${checkOutDateTime}`;
+    // Format times in user's timezone for email
+    const checkInLocal = DateTime.fromISO(checkInUTC)
+      .setZone(userTimezone)
+      .toFormat("yyyy-MM-dd HH:mm ZZZZ");
+    const checkOutLocal = DateTime.fromISO(checkOutUTC)
+      .setZone(userTimezone)
+      .toFormat("yyyy-MM-dd HH:mm ZZZZ");
+
+    const emailMessage = `Greetings from Bookit. Your booking has been confirmed. Check-in: ${checkInLocal}, Check-out: ${checkOutLocal}`;
 
     await sendEmailNotification(user.id, emailMessage);
 

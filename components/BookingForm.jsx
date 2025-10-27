@@ -6,12 +6,14 @@ import { toast } from "react-toastify";
 import { bookRoom } from "@/app/actions/bookRoom";
 // Import the useAuth hook to access authentication status
 import { useAuth } from "@/context/authContext";
+import { useUserTimezone } from "./TimezoneHandler";
 
 const BookingForm = ({ room }) => {
   const router = useRouter();
   const [state, formAction] = useFormState(bookRoom, {});
   // Get authentication status from context
   const { isAuthenticated } = useAuth();
+  const { timezone, loading } = useUserTimezone();
 
   useEffect(() => {
     if (state.error) toast.error(state.error);
@@ -22,12 +24,17 @@ const BookingForm = ({ room }) => {
   }, [state, router]);
 
   if (!isAuthenticated) return null; // Hide form if not authenticated
+  if (loading) return <div>Loading timezone...</div>;
 
   return (
     <div className='mt-6'>
       <h2 className='text-xl font-bold'>Book this Room</h2>
+      <p className='text-sm text-gray-600 mb-4'>
+        Times shown in your timezone: <strong>{timezone}</strong>
+      </p>
       <form action={formAction} className='mt-4'>
         <input type='hidden' name='room_id' value={room.$id} />
+        <input type='hidden' name='user_timezone' value={timezone} />
         <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
           <div>
             <label htmlFor='check_in_date' className='block text-sm font-medium text-gray-700'>
